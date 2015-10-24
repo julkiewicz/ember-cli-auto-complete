@@ -51,7 +51,7 @@ export default Ember.Component.extend({
     keepHighlightInView(event);
   },
   focusIn: function () {
-    if (this.get("visibility") === HIDDEN) {
+    if (this.get("actualVisibility") === HIDDEN) {
       this.setVisible();
     }
   },
@@ -71,7 +71,7 @@ export default Ember.Component.extend({
     focusOutEvent = Ember.run.later(this, func, 200);
   },
   keyDown: function (event) {
-    if (this.get("visibility") !== HIDDEN) {
+    if (this.get("actualVisibility") !== HIDDEN) {
       if (KeyCodes.keyPressed(event) === "downArrow") {
         this.highlight("down");
       } else if (KeyCodes.keyPressed(event) === "upArrow") {
@@ -120,9 +120,12 @@ export default Ember.Component.extend({
     return input === suggestions[0].get(this.get('valueProperty')).toLowerCase();
   },
   setVisible(){
-    let visible =  !this.get('hideWhenNoSuggestions') || this.get('suggestions').length > 0;
-    this.set('visibility', (visible ? VISIBLE : HIDDEN));
+    this.set('visibility', VISIBLE);
   },
+  actualVisibility: function() {
+    let visible = this.get('visibility') === VISIBLE && !this.get('hideWhenNoSuggestions') || this.get('suggestions').length > 0;
+    return visible ? VISIBLE : HIDDEN;
+  }.property('visibility', 'hideWhenNoSuggestions', 'suggestions.length'),
   actions: {
     selectItem: function (item) {
       var valueProperty = this.get("valueProperty");
