@@ -28,6 +28,7 @@ function keepHighlightInView(event) {
 export default Ember.Component.extend({
   layoutName: "components/auto-complete",
   highlightIndex: -1,
+  selectableSuggestion: null,
   visibility: HIDDEN,
   hideWhenNoSuggestions: false,
   inputClass: '',
@@ -42,6 +43,7 @@ export default Ember.Component.extend({
       this.set("visibility", HIDDEN);
     } else if (!KeyCodes.isEscapedCode(event)) {
       this.set("highlightIndex", -1);
+      this.set("selectableSuggestion", null);
       this.get("options").forEach(function (item) {
         item.set("highlight", false);
       });
@@ -77,8 +79,8 @@ export default Ember.Component.extend({
       } else if (KeyCodes.keyPressed(event) === "upArrow") {
         this.highlight("up");
       } else if (KeyCodes.keyPressed(event) === "enter" || KeyCodes.keyPressed(event) === "tab") {
-        if (!Ember.isBlank(this.selectableSuggestion)) {
-          this.send("selectItem", this.selectableSuggestion);
+        if (!Ember.isBlank(this.get("selectableSuggestion"))) {
+          this.send("selectItem", this.get("selectableSuggestion"));
           this.set("visibility", HIDDEN);
         } else if (this.hasInputMatchingSuggestion()) {
           this.set("selectedFromList", true);
@@ -123,7 +125,7 @@ export default Ember.Component.extend({
     this.set('visibility', VISIBLE);
   },
   actualVisibility: function() {
-    let visible = this.get('visibility') === VISIBLE && !this.get('hideWhenNoSuggestions') || this.get('suggestions').length > 0;
+    let visible = this.get('visibility') === VISIBLE && (!this.get('hideWhenNoSuggestions') || this.get('suggestions').length > 0);
     return visible ? VISIBLE : HIDDEN;
   }.property('visibility', 'hideWhenNoSuggestions', 'suggestions.length'),
   actions: {
