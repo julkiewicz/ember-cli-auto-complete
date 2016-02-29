@@ -109,7 +109,9 @@ export default Ember.Component.extend({
     }
 
     var newSelectedItem = this.get("suggestions").objectAt(nextHighlight);
-    newSelectedItem.set("highlight", true);
+    if (newSelectedItem) {
+      newSelectedItem.set("highlight", true);
+    }
     this.set("selectableSuggestion", newSelectedItem);
     this.set("highlightIndex", nextHighlight);
   },
